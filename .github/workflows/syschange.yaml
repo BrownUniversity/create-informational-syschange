@@ -1,0 +1,14 @@
+on: workflow_dispatch
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Informational Syschange
+      id: syschange
+      uses: brownuniversity/create-informational-syschange@v1
+      with:
+        summary: "Test Ticket"
+        description: "Testing Create Pull Request Github Action"
+    - name: Print Ticket Link
+      run: echo ${{ steps.syschange.outputs.ticket-url }}
