@@ -4,6 +4,9 @@ inputs:
   summary:
     description: 'Summary of change'
     required: true
+  apiKey:
+    description: 'Atlassian basic auth'
+    required: true
   description:
     description: 'Description of change'
     required: false
@@ -25,8 +28,9 @@ runs:
   using: "composite"
   steps:
     - name: Get current time
-      run: echo "NOW::$(date -u +%FT%TZ)" >> $GITHUB_ENV
+      run: echo "NOW=$(date -u +%FT%TZ)" >> $GITHUB_ENV
       shell: bash
+
     - name: Create Informational Syschange
       id: syschange
       env:
@@ -43,9 +47,9 @@ runs:
         INFORMATIONAL_SYSTEM_CHANGE: '74'
         CHANGE_TYPE: 'customfield_10106'
         INFORMATIONAL_CHANGE_ID: '10192'
- 
       shell: bash
       run: >
+        echo 'RESPONSE<<EOF' >> $GITHUB_ENV
         curl --header 'Content-Type: application/json' \
         --header 'Authorization: Basic $API_KEY' \
         --request POST \
@@ -71,4 +75,12 @@ runs:
             \"id\": \"$INFORMATIONAL_CHANGE_ID\" \
           },
         }}" \
-        https://brown.atlassian.net/rest/api/2/issue 
+        https://brown.atlassian.net/rest/api/2/issue >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+    - name: Set Ticket Link Output
+      shell: bash
+      env:
+        RESPONSE: ${{ env.RESPONSE }}
+      run: >
+        echo '::set-output name=ticket-url::https://brown.atlassian.net/browse/$(jq .key <<< $RESPONSE | tr -d '"')'

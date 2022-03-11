@@ -9,13 +9,14 @@ Creates an informational syschange via Jira Service Management.
   uses: brownuniversity/create-informational-syschange@v1
 ```
 
-See [syschange.yml](.github/workflows/syschange.yml) for an example, and use the [Actions tab](https://github.com/BrownUniversity/create-informational-syschange/actions/workflows/syschange.yaml) to run it.
+See [syschange.yaml](.github/workflows/syschange.yaml) for an example, and use the [Actions tab](https://github.com/BrownUniversity/create-informational-syschange/actions/workflows/syschange.yaml) to run it.
 
 ### Inputs
 
 #### Required
 
 - `summary`: Summary of change
+- `apiKey`: Basic Auth value for Atlassian API
 
 #### Optional
 
