@@ -73,7 +73,7 @@ runs:
           \"$REQUEST_TYPE\": \"$INFORMATIONAL_SYSTEM_CHANGE\" \
           \"$CHANGE_TYPE\": { \
             \"id\": \"$INFORMATIONAL_CHANGE_ID\" \
-          },
+          }, \
         }}" \
         https://brown.atlassian.net/rest/api/2/issue >> $GITHUB_ENV
         echo 'EOF' >> $GITHUB_ENV
