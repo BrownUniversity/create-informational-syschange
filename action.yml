@@ -34,11 +34,6 @@ runs:
     - name: Create Informational Syschange
       id: syschange
       env:
-        API_KEY: ${{ secrets.API_KEY }}
-        SUMMARY: ${{ inputs.summary }}
-        DESCRIPTION: ${{ inputs.description }}
-        INSTALLER: ${{ inputs.installer }}
-        GROUP: ${{ inputs.group }}
         ISSUE_TYPE_ID: '10014' # [System] Informational Change 
         RESPONSIBLE_GROUP: 'customfield_10058'
         PLANNED_START: 'customfield_10107'
@@ -48,39 +43,32 @@ runs:
         CHANGE_TYPE: 'customfield_10106'
         INFORMATIONAL_CHANGE_ID: '10192'
       shell: bash
-      run: >
-        echo 'RESPONSE<<EOF' >> $GITHUB_ENV
-        curl --header 'Content-Type: application/json' \
-        --header 'Authorization: Basic $API_KEY' \
-        --request POST \
-        --data "{\"fields\": { \
-          \"summary\": \"$SUMMARY\", \
-          \"description\": \"$DESCRIPTION\", \
-          \"reporter\": { \
-            \"id\": \"$INSTALLER\" \
-          }, \
-          \"$RESPONSIBLE_GROUP\": { \
-            \"name\": \"$GROUP\" \
-          }, \
-          \"$PLANNED_START\": \"$NOW\", \
-          \"$PLANNED_END\": \"$NOW\", \
-          \"project\": { \
-            \"key\": \"SYS\" \
-          }, \
-          \"issuetype\": { \
-            \"id\": \"$ISSUE_TYPE_ID\" \
-          }, \
-          \"$REQUEST_TYPE\": \"$INFORMATIONAL_SYSTEM_CHANGE\" \
-          \"$CHANGE_TYPE\": { \
-            \"id\": \"$INFORMATIONAL_CHANGE_ID\" \
-          },
-        }}" \
-        https://brown.atlassian.net/rest/api/2/issue >> $GITHUB_ENV
-        echo 'EOF' >> $GITHUB_ENV
-
-    - name: Set Ticket Link Output
-      shell: bash
-      env:
-        RESPONSE: ${{ env.RESPONSE }}
-      run: >
-        echo '::set-output name=ticket-url::https://brown.atlassian.net/browse/$(grep -Eo "SYS-\d*" <<< $RESPONSE)'
+      run: |
+        RESPONSE=$(curl --header 'Content-Type: application/json' \
+          --request POST \
+          --user ${{ inputs.apiKey }} \
+          --data '{"fields": {
+            "summary": "${{ inputs.summary }}",
+            "description": "${{ inputs.description }}",
+            "reporter": {
+              "id": "${{ inputs.installer }}"
+            },
+            "${{ env.RESPONSIBLE_GROUP }}": {
+              "name": "${{ inputs.group }}"
+            },
+            "${{ env.PLANNED_START }}": "${{ env.NOW }}",
+            "${{ env.PLANNED_END }}": "${{ env.NOW }}",
+            "project": {
+              "key": "SYS"
+            },
+            "issuetype": {
+              "id": "${{ env.ISSUE_TYPE_ID }}"
+            },
+            "${{ env.REQUEST_TYPE }}": "${{ env.INFORMATIONAL_SYSTEM_CHANGE }}",
+            "${{ env.CHANGE_TYPE }}": {
+              "id": "10192"
+            }
+          }}' \
+          https://brown.atlassian.net/rest/api/2/issue)
+        TICKET_KEY=$(echo "$RESPONSE" | grep -o 'SYS-[0-9]*')
+        echo "::set-output name=ticket-url::https://brown.atlassian.net/browse/$TICKET_KEY"

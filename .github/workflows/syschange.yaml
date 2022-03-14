@@ -1,3 +1,4 @@
+name: Create Informational Syschange
 on: workflow_dispatch
 
 jobs:
@@ -12,4 +13,6 @@ jobs:
         description: "Testing Create Pull Request Github Action"
         apiKey: ${{ secrets.API_KEY }}
     - name: Print Ticket Link
-      run: echo ${{ steps.syschange.outputs.ticket-url }}
+      run: |
+        echo '::echo::on'
+        echo "${{ steps.syschange.outputs.ticket-link }}"

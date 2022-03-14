@@ -16,7 +16,7 @@ See [syschange.yaml](.github/workflows/syschange.yaml) for an example, and use t
 #### Required
 
 - `summary`: Summary of change
-- `apiKey`: Basic Auth value for Atlassian API
+- `apiKey`: Atlassian API key
 
 #### Optional
 
