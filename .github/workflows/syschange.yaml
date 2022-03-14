@@ -1,3 +1,4 @@
+name: Create Informational Syschange
 on: workflow_dispatch
 
 jobs:
