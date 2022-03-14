@@ -1,0 +1,86 @@
+name: 'Create Informational Syschange'
+description: 'Create an Informational Syschange'
+inputs:
+  summary:
+    description: 'Summary of change'
+    required: true
+  apiKey:
+    description: 'Atlassian basic auth'
+    required: true
+  description:
+    description: 'Description of change'
+    required: false
+    default: ''
+  installer:
+    description: "Syschange installer Atlassian ID"
+    required: false
+    default: '5a1c643d2939341a89906a9b'
+  group:
+    description: 'Syschange responsible group name'
+    required: false
+    default: 'OIT-JSM-Web Services'
+outputs:
+  ticket-link:
+    description: 'URL of created Informational Syschange'
+    value: ${{ steps.syschange.outputs.ticket-url }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get current time
+      run: echo "NOW=$(date -u +%FT%TZ)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Create Informational Syschange
+      id: syschange
+      env:
+        API_KEY: ${{ secrets.API_KEY }}
+        SUMMARY: ${{ inputs.summary }}
+        DESCRIPTION: ${{ inputs.description }}
+        INSTALLER: ${{ inputs.installer }}
+        GROUP: ${{ inputs.group }}
+        ISSUE_TYPE_ID: '10014' # [System] Informational Change 
+        RESPONSIBLE_GROUP: 'customfield_10058'
+        PLANNED_START: 'customfield_10107'
+        PLANNED_END: 'customfield_10049'
+        REQUEST_TYPE: 'customfield_10010'
+        INFORMATIONAL_SYSTEM_CHANGE: '74'
+        CHANGE_TYPE: 'customfield_10106'
+        INFORMATIONAL_CHANGE_ID: '10192'
+      shell: bash
+      run: >
+        echo 'RESPONSE<<EOF' >> $GITHUB_ENV
+        curl --header 'Content-Type: application/json' \
+        --header 'Authorization: Basic $API_KEY' \
+        --request POST \
+        --data "{\"fields\": { \
+          \"summary\": \"$SUMMARY\", \
+          \"description\": \"$DESCRIPTION\", \
+          \"reporter\": { \
+            \"id\": \"$INSTALLER\" \
+          }, \
+          \"$RESPONSIBLE_GROUP\": { \
+            \"name\": \"$GROUP\" \
+          }, \
+          \"$PLANNED_START\": \"$NOW\", \
+          \"$PLANNED_END\": \"$NOW\", \
+          \"project\": { \
+            \"key\": \"SYS\" \
+          }, \
+          \"issuetype\": { \
+            \"id\": \"$ISSUE_TYPE_ID\" \
+          }, \
+          \"$REQUEST_TYPE\": \"$INFORMATIONAL_SYSTEM_CHANGE\" \
+          \"$CHANGE_TYPE\": { \
+            \"id\": \"$INFORMATIONAL_CHANGE_ID\" \
+          },
+        }}" \
+        https://brown.atlassian.net/rest/api/2/issue >> $GITHUB_ENV
+        echo 'EOF' >> $GITHUB_ENV
+
+    - name: Set Ticket Link Output
+      shell: bash
+      env:
+        RESPONSE: ${{ env.RESPONSE }}
+      run: >
+        echo '::set-output name=ticket-url::https://brown.atlassian.net/browse/$(grep -Eo "SYS-\d*" <<< $RESPONSE)'
