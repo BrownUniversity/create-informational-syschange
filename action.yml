@@ -83,4 +83,4 @@ runs:
       env:
         RESPONSE: ${{ env.RESPONSE }}
       run: >
-        echo '::set-output name=ticket-url::https://brown.atlassian.net/browse/$(grep -Eo 'SYS-\d*' <<< $RESPONSE)'
+        echo '::set-output name=ticket-url::https://brown.atlassian.net/browse/$(grep -Eo "SYS-\d*" <<< $RESPONSE)'
