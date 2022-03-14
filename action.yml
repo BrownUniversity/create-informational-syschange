@@ -5,7 +5,7 @@ inputs:
     description: 'Summary of change'
     required: true
   apiKey:
-    description: 'Atlassian basic auth'
+    description: 'Atlassian API Key'
     required: true
   description:
     description: 'Description of change'
@@ -40,8 +40,6 @@ runs:
         PLANNED_END: 'customfield_10049'
         REQUEST_TYPE: 'customfield_10010'
         INFORMATIONAL_SYSTEM_CHANGE: '74'
-        CHANGE_TYPE: 'customfield_10106'
-        INFORMATIONAL_CHANGE_ID: '10192'
       shell: bash
       run: |
         RESPONSE=$(curl --header 'Content-Type: application/json' \
@@ -64,10 +62,7 @@ runs:
             "issuetype": {
               "id": "${{ env.ISSUE_TYPE_ID }}"
             },
-            "${{ env.REQUEST_TYPE }}": "${{ env.INFORMATIONAL_SYSTEM_CHANGE }}",
-            "${{ env.CHANGE_TYPE }}": {
-              "id": "10192"
-            }
+            "${{ env.REQUEST_TYPE }}": "${{ env.INFORMATIONAL_SYSTEM_CHANGE }}"
           }}' \
           https://brown.atlassian.net/rest/api/2/issue)
         TICKET_KEY=$(echo "$RESPONSE" | grep -o 'SYS-[0-9]*')

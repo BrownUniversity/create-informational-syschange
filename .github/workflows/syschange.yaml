@@ -11,7 +11,7 @@ jobs:
       with:
         summary: "Test Ticket"
         description: "Testing Create Pull Request Github Action"
-        apiKey: ${{ secrets.API_KEY }}
+        apiKey: ${{ secrets.WS_ATLASSIAN_KEY }}
     - name: Print Ticket Link
       run: |
         echo '::echo::on'
