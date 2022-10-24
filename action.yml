@@ -66,4 +66,4 @@ runs:
           }}' \
           https://brown.atlassian.net/rest/api/2/issue)
         TICKET_KEY=$(echo "$RESPONSE" | grep -o 'SYS-[0-9]*')
-        echo "::set-output name=ticket-url::https://brown.atlassian.net/browse/$TICKET_KEY"
+        echo "ticket-url=https://brown.atlassian.net/browse/$TICKET_KEY" >> $GITHUB_OUTPUT
