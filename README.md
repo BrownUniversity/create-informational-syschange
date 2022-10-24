@@ -6,7 +6,7 @@ Creates an informational syschange via Jira Service Management.
 
 ```yaml
 - name: Create Informational Syschange
-  uses: brownuniversity/create-informational-syschange@v1
+  uses: brownuniversity/create-informational-syschange@v2
 ```
 
 See [syschange.yaml](.github/workflows/syschange.yaml) for an example, and use the [Actions tab](https://github.com/BrownUniversity/create-informational-syschange/actions/workflows/syschange.yaml) to run it.
