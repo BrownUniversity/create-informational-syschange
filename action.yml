@@ -7,6 +7,9 @@ inputs:
   apiKey:
     description: 'Atlassian API Key'
     required: true
+  author:
+    description: 'GitHub username of triggering user'
+    required: true
   description:
     description: 'Description of change'
     required: false
@@ -36,6 +39,7 @@ runs:
       env:
         ISSUE_TYPE_ID: '10014' # [System] Informational Change 
         RESPONSIBLE_GROUP: 'customfield_10058'
+        GITHUB_ID: 'customfield_10392'
         PLANNED_START: 'customfield_10107'
         PLANNED_END: 'customfield_10049'
         REQUEST_TYPE: 'customfield_10010'
@@ -54,6 +58,7 @@ runs:
             "${{ env.RESPONSIBLE_GROUP }}": {
               "name": "${{ inputs.group }}"
             },
+            "${{ env.GITHUB_ID }}": "${{ inputs.author }}",
             "${{ env.PLANNED_START }}": "${{ env.NOW }}",
             "${{ env.PLANNED_END }}": "${{ env.NOW }}",
             "project": {

@@ -11,6 +11,7 @@ jobs:
       with:
         summary: "Test Ticket"
         description: "Testing Create Pull Request Github Action"
+        author: ${{ github.event.sender.login }}
         apiKey: ${{ secrets.WS_ATLASSIAN_KEY }}
     - name: Print Ticket Link
       run: |
