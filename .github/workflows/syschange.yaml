@@ -7,7 +7,7 @@ jobs:
     steps:
     - name: Create Informational Syschange
       id: syschange
-      uses: brownuniversity/create-informational-syschange@main
+      uses: brownuniversity/create-informational-syschange@feature/include-triggering-user
       with:
         summary: "Test Ticket"
         description: "Testing Create Pull Request Github Action"
