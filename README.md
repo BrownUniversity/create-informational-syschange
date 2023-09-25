@@ -18,6 +18,7 @@ See [syschange.yaml](.github/workflows/syschange.yaml) for an example, and use t
 - `summary`: Summary of change
 - `apiKey`: Atlassian API key
 - `author`: GitHub username of triggering user
+- `affectedService`: Atlassian ID of the affected service
 
 #### Optional
 
