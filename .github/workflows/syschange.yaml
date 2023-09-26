@@ -7,11 +7,12 @@ jobs:
     steps:
     - name: Create Informational Syschange
       id: syschange
-      uses: brownuniversity/create-informational-syschange@feature/include-triggering-user
+      uses: brownuniversity/create-informational-syschange@main
       with:
         summary: "Test Ticket"
         description: "Testing Create Pull Request Github Action"
         author: ${{ github.event.sender.login }}
+        affectedService: 1631557
         apiKey: ${{ secrets.WS_ATLASSIAN_KEY }}
     - name: Print Ticket Link
       run: |
