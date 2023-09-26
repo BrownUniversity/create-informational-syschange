@@ -23,7 +23,7 @@ inputs:
   installer:
     description: "Syschange installer Atlassian ID"
     required: false
-    default: '5a1c643d2939341a89906a9b'
+    default: '712020:db823f4a-761e-42b7-aff2-bcd0a391c480'
 outputs:
   ticket-link:
     description: 'URL of created Informational Syschange'

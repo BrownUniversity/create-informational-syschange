@@ -24,7 +24,7 @@ See [syschange.yaml](.github/workflows/syschange.yaml) for an example, and use t
 #### Optional
 
 - `description`: Longer description of change
-- `installer`: Installer Atlassian ID (defaults to Web Services team account)
+- `installer`: Installer Atlassian ID (defaults to EAS service account)
 
 ### Outputs
 
