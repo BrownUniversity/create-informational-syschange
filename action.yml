@@ -52,6 +52,7 @@ runs:
       shell: bash
       run: |
         RESPONSE=$(curl --header 'Content-Type: application/json' \
+          --silent
           --request POST \
           --user ${{ inputs.apiKey }} \
           --data '{"fields": {
