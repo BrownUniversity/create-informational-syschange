@@ -10,6 +10,9 @@ inputs:
   author:
     description: 'GitHub username of triggering user'
     required: true
+  affectedService:
+    description: 'Atlassian ID for the affected service'
+    required: true
   description:
     description: 'Description of change'
     required: false
@@ -43,6 +46,7 @@ runs:
         PLANNED_START: 'customfield_10107'
         PLANNED_END: 'customfield_10049'
         REQUEST_TYPE: 'customfield_10010'
+        AFFECTED_SERVICE: 'customfield_10171'
         INFORMATIONAL_SYSTEM_CHANGE: '74'
       shell: bash
       run: |
@@ -57,6 +61,9 @@ runs:
             },
             "${{ env.RESPONSIBLE_GROUP }}": {
               "name": "${{ inputs.group }}"
+            },
+            "${{ env.AFFECTED_SERVICE }}": {
+              "id": "${{ inputs.affectedService }}"
             },
             "${{ env.GITHUB_ID }}": "${{ inputs.author }}",
             "${{ env.PLANNED_START }}": "${{ env.NOW }}",
