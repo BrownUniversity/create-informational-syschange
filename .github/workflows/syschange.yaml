@@ -12,6 +12,7 @@ jobs:
         summary: "Test Ticket"
         description: "Testing Create Pull Request Github Action"
         author: ${{ github.event.sender.login }}
+        group: "OIT-JSM-Web Services"
         affectedService: 1631557
         apiKey: ${{ secrets.WS_ATLASSIAN_KEY }}
     - name: Print Ticket Link

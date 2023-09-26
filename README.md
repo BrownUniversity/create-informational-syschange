@@ -17,14 +17,14 @@ See [syschange.yaml](.github/workflows/syschange.yaml) for an example, and use t
 
 - `summary`: Summary of change
 - `author`: GitHub username of triggering user
+- `group`: Responsible group for the change (e.g OIT-JSM-Web Services)
 - `affectedService`: Atlassian ID of the affected service (see below)
 - `apiKey`: Atlassian API key
 
 #### Optional
 
 - `description`: Longer description of change
-- `group`: Responsible group for the change (defaults to Web Services)
-- `installer`: Installer Atlassian ID (defaults to Web Services team account)
+- `installer`: Installer Atlassian ID (defaults to EAS service account)
 
 ### Outputs
 
