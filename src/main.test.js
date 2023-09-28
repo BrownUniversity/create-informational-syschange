@@ -20,10 +20,7 @@ function setInputs(inputs) {
       ...memo,
       [`INPUT_${input.toUpperCase()}`]: inputs[input],
     }),
-    {
-      INPUT_DESCRIPTION: "",
-      INPUT_INSTALLER: "712020:db823f4a-761e-42b7-aff2-bcd0a391c480",
-    },
+    {},
   );
 }
 

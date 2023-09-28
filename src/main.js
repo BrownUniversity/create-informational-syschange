@@ -20,13 +20,13 @@ const customFields = {
 async function run() {
   try {
     const inputs = {
-      summary: core.getInput("summary"),
-      author: core.getInput("author"),
-      group: core.getInput("group"),
-      affectedServices: core.getInput("affectedServices"),
-      apiKey: core.getInput("apiKey"),
-      description: core.getInput("description", ""),
-      installer: core.getInput("installer", jsmConstants.DEFAULT_INSTALLER),
+      summary: core.getInput("summary", { required: true }),
+      author: core.getInput("author", { required: true }),
+      group: core.getInput("group", { required: true }),
+      affectedServices: core.getInput("affectedServices", { required: true }),
+      apiKey: core.getInput("apiKey", { required: true }),
+      description: core.getInput("description") || "",
+      installer: core.getInput("installer") || jsmConstants.DEFAULT_INSTALLER,
     };
     const affectedServicesJson = inputs.affectedServices
       .split(",")
