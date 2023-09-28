@@ -1,26 +1,32 @@
-const mockPostJson = jest.fn();
-
-const core = require("@actions/core");
-const http = require("@actions/http-client");
-const run = require("./main");
+import { jest } from "@jest/globals";
+import * as core from "@actions/core";
+import nock from "nock";
+import run from "./main";
 
 jest.spyOn(core, "setOutput").mockImplementation(() => {});
 jest.spyOn(core, "setFailed").mockImplementation(() => {});
 jest.spyOn(core, "debug").mockImplementation(() => {});
-jest.spyOn(http, "HttpClient").mockImplementation(() => {});
+
+nock.disableNetConnect();
+
+let replacedEnv: jest.Replaced<typeof process.env> | undefined = undefined;
 
 beforeEach(() => {
-  process.env = {};
-  jest.clearAllMocks();
+  replacedEnv?.restore();
+  nock.cleanAll();
 });
 
-function setInputs(inputs) {
-  process.env = Object.keys(inputs).reduce(
-    (memo, input) => ({
-      ...memo,
-      [`INPUT_${input.toUpperCase()}`]: inputs[input],
-    }),
-    {},
+function setInputs(inputs: Record<string, string>): void {
+  replacedEnv = jest.replaceProperty(
+    process,
+    "env",
+    Object.keys(inputs).reduce(
+      (memo, input) => ({
+        ...memo,
+        [`INPUT_${input.toUpperCase()}`]: inputs[input],
+      }),
+      {},
+    ),
   );
 }
 
@@ -37,17 +43,10 @@ describe("with default inputs", () => {
       affectedServices: "12345",
       apiKey: "username:password",
     });
-    const postJson = jest.fn(async () => ({
-      statusCode: 200,
-      result: { key: "1234" },
-    }));
-    http.HttpClient.mockReturnValueOnce({ postJson });
-
-    await run();
-    expect(postJson).toHaveBeenCalledTimes(1);
-    expect(postJson).toHaveBeenCalledWith(
-      "https://brown.atlassian.net/rest/api/2/issue",
-      {
+    const scope = nock("https://brown.atlassian.net", {
+      reqheaders: expectedHeaders,
+    })
+      .post("/rest/api/2/issue", {
         fields: {
           summary: "Generic v1.0.1",
           description: "",
@@ -60,21 +59,19 @@ describe("with default inputs", () => {
             { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:12345" },
           ],
           customfield_10392: "oit-eas-blackhole",
-          customfield_10107: expect.stringMatching(
-            /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/,
-          ),
-          customfield_10049: expect.stringMatching(
-            /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/,
-          ),
+          customfield_10107: /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/,
+          customfield_10049: /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/,
         },
-      },
-      expectedHeaders,
-    );
+      })
+      .reply(200, { key: "1234" });
+
+    await run();
     expect(core.setOutput).toHaveBeenCalledTimes(1);
     expect(core.setOutput).toHaveBeenCalledWith(
       "ticket-link",
       "https://brown.atlassian.net/browse/1234",
     );
+    expect(scope.isDone()).toBe(true);
   });
 });
 
@@ -89,17 +86,10 @@ describe("with optional inputs", () => {
       description: "Released v1.0.1 of Generic",
       installer: "test-installer-id",
     });
-    const postJson = jest.fn(async () => ({
-      statusCode: 200,
-      result: { key: "1234" },
-    }));
-    http.HttpClient.mockReturnValueOnce({ postJson });
-
-    await run();
-    expect(postJson).toHaveBeenCalledTimes(1);
-    expect(postJson).toHaveBeenCalledWith(
-      "https://brown.atlassian.net/rest/api/2/issue",
-      {
+    const scope = nock("https://brown.atlassian.net", {
+      reqheaders: expectedHeaders,
+    })
+      .post("/rest/api/2/issue", {
         fields: {
           summary: "Generic v1.0.1",
           description: "Released v1.0.1 of Generic",
@@ -112,21 +102,19 @@ describe("with optional inputs", () => {
             { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:12345" },
           ],
           customfield_10392: "oit-eas-blackhole",
-          customfield_10107: expect.stringMatching(
-            /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/,
-          ),
-          customfield_10049: expect.stringMatching(
-            /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/,
-          ),
+          customfield_10107: /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/,
+          customfield_10049: /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/,
         },
-      },
-      expectedHeaders,
-    );
+      })
+      .reply(200, { key: "1234" });
+
+    await run();
     expect(core.setOutput).toHaveBeenCalledTimes(1);
     expect(core.setOutput).toHaveBeenCalledWith(
       "ticket-link",
       "https://brown.atlassian.net/browse/1234",
     );
+    expect(scope.isDone()).toBe(true);
   });
 });
 
@@ -139,30 +127,24 @@ describe("affected services", () => {
       affectedServices: "12345",
       apiKey: "username:password",
     });
-    const postJson = jest.fn(async () => ({
-      statusCode: 200,
-      result: { key: "1234" },
-    }));
-    http.HttpClient.mockReturnValueOnce({ postJson });
+    const scope = nock("https://brown.atlassian.net", {
+      reqheaders: expectedHeaders,
+    })
+      .post("/rest/api/2/issue", (body) => {
+        expect(body.fields.customfield_10171).toEqual([
+          { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:12345" },
+        ]);
+        return true;
+      })
+      .reply(200, { key: "1234" });
 
     await run();
-    expect(postJson).toHaveBeenCalledTimes(1);
-    expect(postJson).toHaveBeenCalledWith(
-      "https://brown.atlassian.net/rest/api/2/issue",
-      {
-        fields: expect.objectContaining({
-          customfield_10171: [
-            { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:12345" },
-          ],
-        }),
-      },
-      expectedHeaders,
-    );
     expect(core.setOutput).toHaveBeenCalledTimes(1);
     expect(core.setOutput).toHaveBeenCalledWith(
       "ticket-link",
       "https://brown.atlassian.net/browse/1234",
     );
+    expect(scope.isDone()).toBe(true);
   });
 
   it("can be multi-valued", async () => {
@@ -173,32 +155,26 @@ describe("affected services", () => {
       affectedServices: "12345,67890,46873",
       apiKey: "username:password",
     });
-    const postJson = jest.fn(async () => ({
-      statusCode: 200,
-      result: { key: "1234" },
-    }));
-    http.HttpClient.mockReturnValueOnce({ postJson });
+    const scope = nock("https://brown.atlassian.net", {
+      reqheaders: expectedHeaders,
+    })
+      .post("/rest/api/2/issue", (body) => {
+        expect(body.fields.customfield_10171).toEqual([
+          { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:12345" },
+          { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:67890" },
+          { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:46873" },
+        ]);
+        return true;
+      })
+      .reply(200, { key: "1234" });
 
     await run();
-    expect(postJson).toHaveBeenCalledTimes(1);
-    expect(postJson).toHaveBeenCalledWith(
-      "https://brown.atlassian.net/rest/api/2/issue",
-      {
-        fields: expect.objectContaining({
-          customfield_10171: [
-            { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:12345" },
-            { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:67890" },
-            { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:46873" },
-          ],
-        }),
-      },
-      expectedHeaders,
-    );
     expect(core.setOutput).toHaveBeenCalledTimes(1);
     expect(core.setOutput).toHaveBeenCalledWith(
       "ticket-link",
       "https://brown.atlassian.net/browse/1234",
     );
+    expect(scope.isDone()).toBe(true);
   });
 });
 
@@ -210,12 +186,14 @@ it("handles errors", async () => {
     affectedServices: "12345,67890,46873",
     apiKey: "username:password",
   });
-  const postJson = jest.fn(async () => {
-    throw new http.HttpClientError("Failed request: (500)", 500);
-  });
-  http.HttpClient.mockReturnValueOnce({ postJson });
+  const scope = nock("https://brown.atlassian.net", {
+    reqheaders: expectedHeaders,
+  })
+    .post("/rest/api/2/issue")
+    .reply(500);
 
   await run();
   expect(core.setFailed).toHaveBeenCalledTimes(1);
   expect(core.setFailed).toHaveBeenCalledWith("Failed request: (500)");
+  expect(scope.isDone()).toBe(true);
 });

@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 241:
+/***/ 351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -135,7 +135,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIDToken = exports.getState = exports.saveState = exports.group = exports.endGroup = exports.startGroup = exports.info = exports.notice = exports.warning = exports.error = exports.debug = exports.isDebug = exports.setFailed = exports.setCommandEcho = exports.setOutput = exports.getBooleanInput = exports.getMultilineInput = exports.getInput = exports.addPath = exports.setSecret = exports.exportVariable = exports.ExitCode = void 0;
-const command_1 = __nccwpck_require__(241);
+const command_1 = __nccwpck_require__(351);
 const file_command_1 = __nccwpck_require__(717);
 const utils_1 = __nccwpck_require__(278);
 const os = __importStar(__nccwpck_require__(37));
@@ -2722,78 +2722,114 @@ exports["default"] = _default;
 
 /***/ }),
 
-/***/ 713:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ 144:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
-const core = __nccwpck_require__(186);
-const http = __nccwpck_require__(255);
+"use strict";
 
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const main_1 = __importDefault(__nccwpck_require__(399));
+(0, main_1.default)();
+
+
+/***/ }),
+
+/***/ 399:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(186));
+const http_client_1 = __nccwpck_require__(255);
 const jsmConstants = {
-  PROJECT_TYPE: "SYS",
-  ISSUE_TYPE: "10014", // [System] Informational Change
-  INFORMATIONAL: "74", // Informational System Change
-  WORKSPACE_ID: "3015eb17-fcd8-4eb8-b534-dfbce48cd828",
-  DEFAULT_INSTALLER: "712020:db823f4a-761e-42b7-aff2-bcd0a391c480", // oit-eas-blackhole
+    PROJECT_TYPE: "SYS",
+    ISSUE_TYPE: "10014",
+    INFORMATIONAL: "74",
+    WORKSPACE_ID: "3015eb17-fcd8-4eb8-b534-dfbce48cd828",
+    DEFAULT_INSTALLER: "712020:db823f4a-761e-42b7-aff2-bcd0a391c480", // oit-eas-blackhole
 };
 const customFields = {
-  REQUEST_TYPE: "customfield_10010",
-  RESPONSIBLE_GROUP: "customfield_10058",
-  AFFECTED_SERVICES: "customfield_10171",
-  GITHUB_ID: "customfield_10392",
-  PLANNED_START: "customfield_10107",
-  PLANNED_END: "customfield_10049",
+    REQUEST_TYPE: "customfield_10010",
+    RESPONSIBLE_GROUP: "customfield_10058",
+    AFFECTED_SERVICES: "customfield_10171",
+    GITHUB_ID: "customfield_10392",
+    PLANNED_START: "customfield_10107",
+    PLANNED_END: "customfield_10049",
 };
-
 async function run() {
-  try {
-    const inputs = {
-      summary: core.getInput("summary"),
-      author: core.getInput("author"),
-      group: core.getInput("group"),
-      affectedServices: core.getInput("affectedServices"),
-      apiKey: core.getInput("apiKey"),
-      description: core.getInput("description", ""),
-      installer: core.getInput("installer", jsmConstants.DEFAULT_INSTALLER),
-    };
-    const affectedServicesJson = inputs.affectedServices
-      .split(",")
-      .map((id) => ({ id: `3015eb17-fcd8-4eb8-b534-dfbce48cd828:${id}` }));
-    const now = new Date().toISOString().replace(/\.\d+/, "");
-    const data = {
-      fields: {
-        summary: inputs.summary,
-        description: inputs.description,
-        project: { key: jsmConstants.PROJECT_TYPE },
-        reporter: { id: inputs.installer },
-        issuetype: { id: jsmConstants.ISSUE_TYPE },
-        [customFields.REQUEST_TYPE]: jsmConstants.INFORMATIONAL,
-        [customFields.RESPONSIBLE_GROUP]: { name: inputs.group },
-        [customFields.AFFECTED_SERVICES]: affectedServicesJson,
-        [customFields.GITHUB_ID]: inputs.author,
-        [customFields.PLANNED_START]: now,
-        [customFields.PLANNED_END]: now,
-      },
-    };
-    const headers = {
-      authorization: `Basic ${Buffer.from(inputs.apiKey).toString("base64")}`,
-    };
-    const client = new http.HttpClient("create-informational-syschange");
-    const response = await client.postJson(
-      "https://brown.atlassian.net/rest/api/2/issue",
-      data,
-      headers,
-    );
-    core.debug(response.statusCode);
-    core.setOutput(
-      "ticket-link",
-      `https://brown.atlassian.net/browse/${response.result.key}`,
-    );
-  } catch (error) {
-    core.setFailed(error.message);
-  }
+    try {
+        const inputs = {
+            summary: core.getInput("summary", { required: true }),
+            author: core.getInput("author", { required: true }),
+            group: core.getInput("group", { required: true }),
+            affectedServices: core.getInput("affectedServices", { required: true }),
+            apiKey: core.getInput("apiKey", { required: true }),
+            description: core.getInput("description") || "",
+            installer: core.getInput("installer") || jsmConstants.DEFAULT_INSTALLER,
+        };
+        const affectedServicesJson = inputs.affectedServices
+            .split(",")
+            .map((id) => ({ id: `${jsmConstants.WORKSPACE_ID}:${id}` }));
+        const now = new Date().toISOString().replace(/\.\d+/, "");
+        const data = {
+            fields: {
+                summary: inputs.summary,
+                description: inputs.description,
+                project: { key: jsmConstants.PROJECT_TYPE },
+                reporter: { id: inputs.installer },
+                issuetype: { id: jsmConstants.ISSUE_TYPE },
+                [customFields.REQUEST_TYPE]: jsmConstants.INFORMATIONAL,
+                [customFields.RESPONSIBLE_GROUP]: { name: inputs.group },
+                [customFields.AFFECTED_SERVICES]: affectedServicesJson,
+                [customFields.GITHUB_ID]: inputs.author,
+                [customFields.PLANNED_START]: now,
+                [customFields.PLANNED_END]: now,
+            },
+        };
+        const headers = {
+            authorization: `Basic ${Buffer.from(inputs.apiKey).toString("base64")}`,
+        };
+        const client = new http_client_1.HttpClient("create-informational-syschange");
+        const response = await client.postJson("https://brown.atlassian.net/rest/api/2/issue", data, headers);
+        core.debug(`${response.statusCode}`);
+        if (response.statusCode < 300 && response.result) {
+            core.setOutput("ticket-link", `https://brown.atlassian.net/browse/${response.result.key}`);
+        }
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            core.setFailed(error.message);
+        }
+    }
 }
-
-module.exports = run;
+exports["default"] = run;
 
 
 /***/ }),
@@ -2924,15 +2960,12 @@ module.exports = require("util");
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-(() => {
-const run = __nccwpck_require__(713);
-
-run();
-
-})();
-
-module.exports = __webpack_exports__;
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require__(144);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;

@@ -1,5 +1,5 @@
-const core = require("@actions/core");
-const http = require("@actions/http-client");
+import * as core from "@actions/core";
+import { HttpClient } from "@actions/http-client";
 
 const jsmConstants = {
   PROJECT_TYPE: "SYS",
@@ -17,7 +17,7 @@ const customFields = {
   PLANNED_END: "customfield_10049",
 };
 
-async function run() {
+export default async function run(): Promise<void> {
   try {
     const inputs = {
       summary: core.getInput("summary", { required: true }),
@@ -50,20 +50,22 @@ async function run() {
     const headers = {
       authorization: `Basic ${Buffer.from(inputs.apiKey).toString("base64")}`,
     };
-    const client = new http.HttpClient("create-informational-syschange");
-    const response = await client.postJson(
+    const client = new HttpClient("create-informational-syschange");
+    const response = await client.postJson<{ key: string }>(
       "https://brown.atlassian.net/rest/api/2/issue",
       data,
       headers,
     );
-    core.debug(response.statusCode);
-    core.setOutput(
-      "ticket-link",
-      `https://brown.atlassian.net/browse/${response.result.key}`,
-    );
+    core.debug(`${response.statusCode}`);
+    if (response.statusCode < 300 && response.result) {
+      core.setOutput(
+        "ticket-link",
+        `https://brown.atlassian.net/browse/${response.result.key}`,
+      );
+    }
   } catch (error) {
-    core.setFailed(error.message);
+    if (error instanceof Error) {
+      core.setFailed(error.message);
+    }
   }
 }
-
-module.exports = run;
