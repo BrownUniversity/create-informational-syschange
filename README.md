@@ -18,7 +18,7 @@ See [syschange.yaml](.github/workflows/syschange.yaml) for an example, and use t
 - `summary`: Summary of change
 - `author`: GitHub username of triggering user
 - `group`: Responsible group for the change (e.g OIT-JSM-Web Services)
-- `affectedServices`: Comma-separated Atlassian IDs of the affected services (see below)
+- `affectedService`: Atlassian ID of the affected service (see below)
 - `apiKey`: Atlassian API key
 
 #### Optional
@@ -32,7 +32,7 @@ See [syschange.yaml](.github/workflows/syschange.yaml) for an example, and use t
 
 ### Required Data
 
-To find the Atlassian ID of an affected service (we'll use ASK as an example):
+To find the Atlassian ID of the affected service (we'll use ASK as an example):
 
 1. Navigate to the JSM application object collection: https://brown.atlassian.net/jira/servicedesk/assets/object-schema/3?typeId=25
 2. Locate your service: https://brown.atlassian.net/jira/servicedesk/assets/object-schema/3?typeId=25&objectId=509576
