@@ -30,7 +30,7 @@ async function run() {
     };
     const affectedServicesJson = inputs.affectedServices
       .split(",")
-      .map((id) => ({ id: `3015eb17-fcd8-4eb8-b534-dfbce48cd828:${id}` }));
+      .map((id) => ({ id: `${jsmConstants.WORKSPACE_ID}:${id}` }));
     const now = new Date().toISOString().replace(/\.\d+/, "");
     const data = {
       fields: {
