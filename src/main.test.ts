@@ -41,6 +41,7 @@ describe("with default inputs", () => {
       author: "oit-eas-blackhole",
       group: "OIT-JSM-EAS",
       affectedServices: "12345",
+      affectedIntegrations: "6789",
       apiKey: "username:password",
     });
     const scope = nock("https://brown.atlassian.net", {
@@ -57,6 +58,9 @@ describe("with default inputs", () => {
           customfield_10058: { name: "OIT-JSM-EAS" },
           customfield_10171: [
             { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:12345" },
+          ],
+          customfield_10406: [
+            { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:6789" },
           ],
           customfield_10392: "oit-eas-blackhole",
           customfield_10107: /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/,
@@ -82,6 +86,7 @@ describe("with optional inputs", () => {
       author: "oit-eas-blackhole",
       group: "OIT-JSM-EAS",
       affectedServices: "12345",
+      affectedIntegrations: "6789",
       apiKey: "username:password",
       description: "Released v1.0.1 of Generic",
       installer: "test-installer-id",
@@ -100,6 +105,9 @@ describe("with optional inputs", () => {
           customfield_10058: { name: "OIT-JSM-EAS" },
           customfield_10171: [
             { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:12345" },
+          ],
+          customfield_10406: [
+            { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:6789" },
           ],
           customfield_10392: "oit-eas-blackhole",
           customfield_10107: /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/,
@@ -125,6 +133,7 @@ describe("affected services", () => {
       author: "oit-eas-blackhole",
       group: "OIT-JSM-EAS",
       affectedServices: "12345",
+      affectedIntegrations: "6789",
       apiKey: "username:password",
     });
     const scope = nock("https://brown.atlassian.net", {
@@ -153,6 +162,7 @@ describe("affected services", () => {
       author: "oit-eas-blackhole",
       group: "OIT-JSM-EAS",
       affectedServices: "12345,67890,46873",
+      affectedIntegrations: "6789",
       apiKey: "username:password",
     });
     const scope = nock("https://brown.atlassian.net", {
@@ -178,12 +188,101 @@ describe("affected services", () => {
   });
 });
 
+describe("affected integrations", () => {
+  it("can be single-valued", async () => {
+    setInputs({
+      summary: "Generic v1.0.1",
+      author: "oit-eas-blackhole",
+      group: "OIT-JSM-EAS",
+      affectedServices: "12345",
+      affectedIntegrations: "6789",
+      apiKey: "username:password",
+    });
+    const scope = nock("https://brown.atlassian.net", {
+      reqheaders: expectedHeaders,
+    })
+      .post("/rest/api/2/issue", (body) => {
+        expect(body.fields.customfield_10406).toEqual([
+          { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:6789" },
+        ]);
+        return true;
+      })
+      .reply(200, { key: "1234" });
+
+    await run();
+    expect(core.setOutput).toHaveBeenCalledTimes(1);
+    expect(core.setOutput).toHaveBeenCalledWith(
+      "ticket-link",
+      "https://brown.atlassian.net/browse/1234",
+    );
+    expect(scope.isDone()).toBe(true);
+  });
+
+  it("can be multi-valued", async () => {
+    setInputs({
+      summary: "Generic v1.0.1",
+      author: "oit-eas-blackhole",
+      group: "OIT-JSM-EAS",
+      affectedServices: "12345",
+      affectedIntegrations: "6789,67890,46873",
+      apiKey: "username:password",
+    });
+    const scope = nock("https://brown.atlassian.net", {
+      reqheaders: expectedHeaders,
+    })
+      .post("/rest/api/2/issue", (body) => {
+        expect(body.fields.customfield_10406).toEqual([
+          { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:6789" },
+          { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:67890" },
+          { id: "3015eb17-fcd8-4eb8-b534-dfbce48cd828:46873" },
+        ]);
+        return true;
+      })
+      .reply(200, { key: "1234" });
+
+    await run();
+    expect(core.setOutput).toHaveBeenCalledTimes(1);
+    expect(core.setOutput).toHaveBeenCalledWith(
+      "ticket-link",
+      "https://brown.atlassian.net/browse/1234",
+    );
+    expect(scope.isDone()).toBe(true);
+  });
+
+  it("can be empty", async () => {
+    setInputs({
+      summary: "Generic v1.0.1",
+      author: "oit-eas-blackhole",
+      group: "OIT-JSM-EAS",
+      affectedServices: "12345",
+      apiKey: "username:password",
+    });
+    const scope = nock("https://brown.atlassian.net", {
+      reqheaders: expectedHeaders,
+    })
+      .post("/rest/api/2/issue", (body) => {
+        expect(Object.keys(body.fields)).not.toContain("customfield_10406");
+        return true;
+      })
+      .reply(200, { key: "1234" });
+
+    await run();
+    expect(core.setOutput).toHaveBeenCalledTimes(1);
+    expect(core.setOutput).toHaveBeenCalledWith(
+      "ticket-link",
+      "https://brown.atlassian.net/browse/1234",
+    );
+    expect(scope.isDone()).toBe(true);
+  });
+});
+
 it("handles errors", async () => {
   setInputs({
     summary: "Generic v1.0.1",
     author: "oit-eas-blackhole",
     group: "OIT-JSM-EAS",
     affectedServices: "12345,67890,46873",
+    affectedIntegrations: "6789",
     apiKey: "username:password",
   });
   const scope = nock("https://brown.atlassian.net", {

@@ -2779,6 +2779,7 @@ const customFields = {
     REQUEST_TYPE: "customfield_10010",
     RESPONSIBLE_GROUP: "customfield_10058",
     AFFECTED_SERVICES: "customfield_10171",
+    AFFECTED_INTEGRATIONS: "customfield_10406",
     GITHUB_ID: "customfield_10392",
     PLANNED_START: "customfield_10107",
     PLANNED_END: "customfield_10049",
@@ -2790,12 +2791,17 @@ async function run() {
             author: core.getInput("author", { required: true }),
             group: core.getInput("group", { required: true }),
             affectedServices: core.getInput("affectedServices", { required: true }),
+            affectedIntegrations: core.getInput("affectedIntegrations") || "",
             apiKey: core.getInput("apiKey", { required: true }),
             description: core.getInput("description") || "",
             installer: core.getInput("installer") || jsmConstants.DEFAULT_INSTALLER,
         };
         const affectedServicesJson = inputs.affectedServices
             .split(",")
+            .map((id) => ({ id: `${jsmConstants.WORKSPACE_ID}:${id}` }));
+        const affectedIntegrationsJson = inputs.affectedIntegrations
+            .split(",")
+            .filter((x) => x)
             .map((id) => ({ id: `${jsmConstants.WORKSPACE_ID}:${id}` }));
         const now = new Date().toISOString().replace(/\.\d+/, "");
         const data = {
@@ -2813,6 +2819,10 @@ async function run() {
                 [customFields.PLANNED_END]: now,
             },
         };
+        if (affectedIntegrationsJson.length > 0) {
+            data.fields[customFields.AFFECTED_INTEGRATIONS] =
+                affectedIntegrationsJson;
+        }
         const headers = {
             authorization: `Basic ${Buffer.from(inputs.apiKey).toString("base64")}`,
         };
