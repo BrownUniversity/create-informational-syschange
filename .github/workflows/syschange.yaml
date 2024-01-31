@@ -15,6 +15,7 @@ jobs:
           author: ${{ github.event.sender.login }}
           group: "OIT-JSM-Web Services"
           affectedServices: 1631557
+          affectedIntegrations: 2344418
           apiKey: ${{ secrets.WS_ATLASSIAN_KEY }}
       - name: Print Ticket Link
         run: |
