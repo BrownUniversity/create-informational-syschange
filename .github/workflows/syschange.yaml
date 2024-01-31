@@ -5,17 +5,19 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-    - name: Create Informational Syschange
-      id: syschange
-      uses: brownuniversity/create-informational-syschange@main
-      with:
-        summary: "Test Ticket"
-        description: "Testing Create Pull Request Github Action"
-        author: ${{ github.event.sender.login }}
-        group: "OIT-JSM-Web Services"
-        affectedServices: 1631557
-        apiKey: ${{ secrets.WS_ATLASSIAN_KEY }}
-    - name: Print Ticket Link
-      run: |
-        echo '::echo::on'
-        echo "${{ steps.syschange.outputs.ticket-link }}"
+      - uses: actions/checkout@v4
+      - name: Create Informational Syschange
+        id: syschange
+        uses: ./
+        with:
+          summary: "Test Ticket"
+          description: "Testing Create Pull Request Github Action"
+          author: ${{ github.event.sender.login }}
+          group: "OIT-JSM-Web Services"
+          affectedServices: 1631557
+          affectedIntegrations: 2344418
+          apiKey: ${{ secrets.WS_ATLASSIAN_KEY }}
+      - name: Print Ticket Link
+        run: |
+          echo '::echo::on'
+          echo "${{ steps.syschange.outputs.ticket-link }}"

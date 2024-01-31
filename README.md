@@ -25,6 +25,7 @@ See [syschange.yaml](.github/workflows/syschange.yaml) for an example, and use t
 
 - `description`: Longer description of change
 - `installer`: Installer Atlassian ID (defaults to EAS service account)
+- `affectedIntegrations`: Comma-separated Atlassian IDs of the affected integrations (see below)
 
 ### Outputs
 
@@ -37,3 +38,9 @@ To find the Atlassian ID of an affected service (we'll use ASK as an example):
 1. Navigate to the JSM application object collection: https://brown.atlassian.net/jira/servicedesk/assets/object-schema/3?typeId=25
 2. Locate your service: https://brown.atlassian.net/jira/servicedesk/assets/object-schema/3?typeId=25&objectId=509576
 3. Grab the `objectId` from URL: `509576`
+
+To find the Atlassian ID of an affected integration (we'll use banner-sapi as an example):
+
+1. Navigate to the JSM application object collection: https://brown.atlassian.net/jira/servicedesk/assets/object-schema/14?typeId=215
+2. Locate your integration: https://brown.atlassian.net/jira/servicedesk/assets/object-schema/14?typeId=215&objectId=2344418
+3. Grab the `objectId` from URL: `2344418`

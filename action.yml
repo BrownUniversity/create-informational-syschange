@@ -24,6 +24,9 @@ inputs:
     description: "Syschange installer Atlassian ID"
     required: false
     default: '712020:db823f4a-761e-42b7-aff2-bcd0a391c480'
+  affectedIntegrations:
+    description: 'Comma-separated list of Atlassian IDs for the affected integrations'
+    required: false
 outputs:
   ticket-link:
     description: 'URL of created Informational Syschange'
